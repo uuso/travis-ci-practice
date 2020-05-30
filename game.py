@@ -18,21 +18,24 @@ def word_pick(filepath):
     try:
         with open(filepath) as file:
             lines = [line.strip() for line in file.readlines()]
+        return choice(lines).upper()
     except FileNotFoundError:
         return None
+        # raise FileNotFoundError("cannot find words list in file \"wordslist.txt\"")
     except IndexError:
         return None
-    return choice(lines)
+        # raise Exception("wordslist.txt is empty")
 
 def word_guessed_dict_init(word):    
-    return dict(zip(word, [False]*len(word)))
+    return dict(zip(word.upper(), [False]*len(word)))
 
 def word_show_game(word, word_guessed_dict):
     if not word_guessed_dict:
-        raise ValueError("word_guessed_dict is not initialized.")
+        raise ValueError("word_guessed_dict is empty or not initialized.")
     return ' '.join([ch if word_guessed_dict[ch] else '_' for ch in word])
 
 def guess(char, word_guessed_dict):
+    char = char.upper()
     if char in word_guessed_dict and not word_guessed_dict[char]:
         word_guessed_dict[char] = True
         return True
@@ -42,6 +45,9 @@ def guess(char, word_guessed_dict):
 
 def run_game():
     word = word_pick(wordslist_path)
+    if word is None:
+        raise Exception("problem with word picking")
+
     wgd = word_guessed_dict_init(word)
     while not all(wgd.values()) and user_fails < user_tries:
         print(health_status_str(), word_show_game(word, wgd), end='   ')
